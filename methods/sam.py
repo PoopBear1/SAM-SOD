@@ -3,7 +3,7 @@ from torch import nn
 from methods.segment_anything import sam_model_registry, SamPredictor
 
 custom_config = {'base'      : {'strategy': 'base_adam',
-                                'batch': 2,
+                                'batch': 8,
                                },
                  'customized': {'--ckpt_path': {'type': str, 'default': './ckpts/sam_vit_b_01ec64.pth'},
                                 '--model_type': {'type': str, 'default': 'vit_b'},
