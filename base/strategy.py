@@ -43,7 +43,7 @@ base_adam_config = {
     'optim': 'Adam',
     'lr': 1e-4,
     'agg_batch': 8,
-    'epoch': 40,
+    'epoch': 10,
 }
 def base_adam(optimizer, current_iter, total_iter, config):
     if (current_iter / total_iter) < 0.5:

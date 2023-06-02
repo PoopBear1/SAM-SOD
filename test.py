@@ -58,14 +58,14 @@ def test_model(model, test_sets, config, saver=None):
                 
             Bar.suffix = '{}/{}'.format(j, titer)
             test_bar.next()
-        
+
         #scores = np.array(scores)
         #print(np.mean(scores, axis=0))
         
         mae, (maxf, meanf, *_), sm, em, wfm = MR.show(bit_num=3)
         #print('  MAE: {}, Max-F: {}, Maen-F: {}, SM: {}, EM: {}, Fbw: {}.'.format(mae, maxf, meanf, sm, em, wfm))
         print('  Max-F: {:.3f}, Maen-F: {:.3f}, Fbw: {:.3f}, MAE: {:.3f}, SM: {:.3f}, EM: {:.3f}.'.format(maxf, meanf, wfm, mae, sm, em))
-        
+
     print('Test using time: {}.'.format(round(time.time() - st, 3)))
 
 def main():

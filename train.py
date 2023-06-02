@@ -129,7 +129,7 @@ def main():
 
         bar.finish()
         
-        if epoch > num_epoch - 10:
+        if epoch > num_epoch - 3:
             weight_path = os.path.join(config['weight_path'], '{}_{}_{}_{}.pth'.format(config['model_name'], config['backbone'], config['sub'], epoch))
             torch.save(model.state_dict(), weight_path)
             test_model(model, test_sets, config, epoch)
