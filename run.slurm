@@ -18,7 +18,7 @@ nvidia-smi
 echo "Loading container"
 
 singularity exec --nv /opt/apps/containers/pytorch22.01-libx11-1.sif \
- python train.py sam --loss=bd --train_prompt --train_decoder
+python train.py sam --loss=bd --train_decoder --sub decoder_only
 
 echo "--- done ---"
 date
