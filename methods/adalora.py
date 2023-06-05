@@ -77,5 +77,5 @@ class Network(nn.Module):
         batched_input = x
         image_size = batched_input.shape[-1]
         out = self.sam(batched_input, multimask_output=False, image_size=image_size)
-        out_dict = {'sal': out['low_res_logits'], 'final': out['low_res_logits']}
+        out_dict = {'sal': out['masks'], 'final': out['masks']}
         return out_dict

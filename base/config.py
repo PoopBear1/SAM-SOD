@@ -19,7 +19,7 @@ def base_config(net_name):
     parser.add_argument('--data_aug', action='store_false', help='Data augmentation, only random crop')
     parser.add_argument('--multi', action='store_false', help='Multi-scale training')
     parser.add_argument('--gpus', default='0', type=str, help='Set the gpu devices')
-    parser.add_argument('--strategy', default='base_sgd', help='Training strategy, see base/strategy.py')
+    parser.add_argument('--strategy', default='base_adam', help='Training strategy, see base/strategy.py')
     parser.add_argument('--batch', default=4, type=int, help='Batch Size for Testing')
 
     # Data setting
