@@ -113,7 +113,8 @@ class Train_Dataset(data.Dataset):
             image = image[:, ::-1]
             gt = gt[:, ::-1]
 
-        image = ((image / 255.) - mean) / std
+        # image = ((image / 255.) - mean) / std
+        image = image / 255.
         image = image.transpose((2, 0, 1))
         gt = np.expand_dims((gt > 128).astype(np.float32), axis=0)
         return image, gt

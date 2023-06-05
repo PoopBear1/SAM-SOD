@@ -34,17 +34,26 @@ sgd_poly_config = {
     }
 def sgd_poly(optimizer, current_iter, total_iter, config):
     factor = pow(1 - (current_iter / total_iter), 0.9)
-        
+
     optimizer.param_groups[0]['lr'] = factor * config['lr'] * 0.1
     optimizer.param_groups[1]['lr'] = factor * config['lr']
+
+# # Base Adam
+# base_adam_config = {
+#     'optim': 'Adam',
+#     'lr': 1e-4,
+#     'agg_batch': 8,
+#     'epoch': 10,
+# }
 
 # Base Adam
 base_adam_config = {
     'optim': 'Adam',
     'lr': 1e-4,
     'agg_batch': 8,
-    'epoch': 10,
+    'epoch': 30,
 }
+
 def base_adam(optimizer, current_iter, total_iter, config):
     if (current_iter / total_iter) < 0.5:
         factor = 1
@@ -52,7 +61,7 @@ def base_adam(optimizer, current_iter, total_iter, config):
         factor = 0.1
     else:
         factor = 0.01
-        
+
     optimizer.param_groups[0]['lr'] = factor * config['lr'] * 0.1
     optimizer.param_groups[1]['lr'] = factor * config['lr']
 
@@ -126,10 +135,10 @@ def sche_scfnet(optimizer, current_iter, total_iter, config):
         T_max = total_iter-mum_step
         cur_iter = current_iter-mum_step
         lr = (1 + math.cos(math.pi * cur_iter / T_max)) / (1 + math.cos(math.pi * (cur_iter - 1) / T_max)) * abs(optimizer.param_groups[1]['lr'] - min_lr) + min_lr
-    
+
     optimizer.param_groups[0]['lr'] = lr * 0.1
     optimizer.param_groups[1]['lr'] = lr
-    
+
 # New test
 sche_our_config = {
     'optim': 'SGD',
@@ -150,10 +159,10 @@ def sche_our(optimizer, current_iter, total_iter, config):
         T_max = total_iter-mum_step
         cur_iter = current_iter-mum_step
         lr = (1 + math.cos(math.pi * cur_iter / T_max)) / (1 + math.cos(math.pi * (cur_iter - 1) / T_max)) * abs(optimizer.param_groups[1]['lr'] - min_lr) + min_lr
-    
+
     optimizer.param_groups[0]['lr'] = lr * 0.1
     optimizer.param_groups[1]['lr'] = lr
-    
+
 
 
 # New test
@@ -174,7 +183,7 @@ def Strategy(model, config):
     strategy = config['strategy']
     stra_config = eval(strategy + '_config')
     config.update(stra_config)
-    
+
     if 'params' in config.keys():
         module_lr = [{'params' : getattr(model, p[0]).parameters(), 'lr' : p[1]} for p in config['params']]
     else:
@@ -188,7 +197,7 @@ def Strategy(model, config):
         if len(encoder) == 0:
             print("Warning: parameters in encoder not found!")
         module_lr = [{'params' : encoder, 'lr' : config['lr']*0.1}, {'params' : others, 'lr' : config['lr']}]
-        
+
     optim = config['optim']
     if optim == 'SGD':
         optimizer = SGD(params=module_lr, lr=config['lr'], momentum=0.9, weight_decay=0.0005)
@@ -196,6 +205,6 @@ def Strategy(model, config):
         optimizer = Adam(params=module_lr, lr=config['lr'], weight_decay=0.0005)
     elif optim == 'AdamW':
         optimizer = AdamW(params=module_lr, lr = config['lr'], weight_decay=0.05)
-        
+
     schedule = eval(strategy)
     return optimizer, schedule
