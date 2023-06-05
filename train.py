@@ -136,7 +136,7 @@ def main():
         if epoch > num_epoch - 3:
             weight_path = os.path.join(config['weight_path'], '{}_{}_{}_{}.pth'.format(config['model_name'], config['backbone'], config['sub'], epoch))
             torch.save(model.state_dict(), weight_path)
-            test_model(model, test_sets, config, saver=saver)
+            test_model(model, test_sets, config, epoch)
 
 
         #if trset in ('DUTS-TR', 'MSB-TR', 'COD-TR') and epoch > num_epoch - 10:
