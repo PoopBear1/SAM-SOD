@@ -19,9 +19,9 @@ from base.util import *
 def test_model(model, test_sets, config, saver=None):
     model.eval()
     st = time.time()
-    config['save'] = True
-    print(config['save'])
-    print(config['save_path'])
+    # config['save'] = True
+    # print(config['save'])
+    # print(config['save_path'])
     for set_name, test_set in test_sets.items():
         save_folder = os.path.join(config['save_path'], set_name)
         check_path(save_folder)
