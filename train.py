@@ -127,13 +127,16 @@ def main():
             # Bar.suffix = '{:4}/{:4} | loss: {:1.6f}, LRs: [{}], time: {:1.3f}.'.format(i, num_iter, float(loss_count / i), lrs, time.time() - st)
             # bar.next()
             print('epoch {:2} | {:4}/{:4} | loss: {:1.6f}, LRs: [{}], time: {:1.3f}.'.format(epoch, i, num_iter, float(loss_count / i), lrs, time.time() - st))
+            # if i > 100:
+                # break
 
         # bar.finish()
 
+        # if True:
         if epoch > num_epoch - 3:
             weight_path = os.path.join(config['weight_path'], '{}_{}_{}_{}.pth'.format(config['model_name'], config['backbone'], config['sub'], epoch))
             torch.save(model.state_dict(), weight_path)
-            test_model(model, test_sets, config, epoch)
+            test_model(model, test_sets, config, saver=saver)
 
 
         #if trset in ('DUTS-TR', 'MSB-TR', 'COD-TR') and epoch > num_epoch - 10:

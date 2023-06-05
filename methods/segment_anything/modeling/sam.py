@@ -80,6 +80,7 @@ class Sam(nn.Module):
             'iou_predictions': iou_predictions,
             'low_res_logits': low_res_masks
         }
+        # print(masks.shape, low_res_masks.shape, iou_predictions.shape)
         return outputs
 
     @torch.no_grad()
@@ -196,7 +197,7 @@ class Sam(nn.Module):
     def preprocess(self, x: torch.Tensor) -> torch.Tensor:
         """Normalize pixel values and pad to a square input."""
         # Normalize colors
-        x = (x - self.pixel_mean) / self.pixel_std
+        # x = (x - self.pixel_mean) / self.pixel_std
 
         # Pad
         h, w = x.shape[-2:]
