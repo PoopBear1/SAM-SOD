@@ -6,7 +6,7 @@
 #SBATCH --mem=16G                               # Job memory request
 #SBATCH --time=5-00:00:00                       # Time limit hrs:min:sec
 #SBATCH --partition=gpu                         # Partition to schedule to
-#SBATCH --gres=gpu:a6000:1   			                # Request a GPU allocation
+#SBATCH --gres=gpu:2080ti:1   			                # Request a GPU allocation
 #SBATCH --output=JOBNAME_%j.log                 # Standard output and error log
 #SBATCH --qos=normal
 
@@ -18,7 +18,11 @@ nvidia-smi
 echo "Loading container"
 
 singularity exec --nv /opt/apps/containers/pytorch22.01-libx11-1.sif \
-python train_ada.py adalora --batch 4 --loss=bd --sub epoch_40_adam
+python train.py sam --loss=bd --train_decoder --train_prompt --sub decoder_prompt_epoch4
+# python train.py sam --loss=bd --train_decoder --sub decoder_only_epoch4
+# python train_ada.py adalora --batch 4 --loss=bd --sub epoch_4_adam_lr5
+# python train.py lora --batch 4 --rank 8 --loss=bd --sub lora_epoch_40_adam
+# python train_ada.py adalora --batch 4 --loss=bd --sub epoch_40_adam
 # python train.py sam --loss=bd --train_decoder --train_prompt --sub decoder_prompt_epoch30_adam # epoch 40
 # python train.py sam --loss=bd --train_decoder --sub decoder_only_epoch30
 # python train_ada.py adalora --batch 4 --loss=bd --sub epoch_30

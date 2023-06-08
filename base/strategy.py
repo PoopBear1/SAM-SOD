@@ -47,12 +47,26 @@ def sgd_poly(optimizer, current_iter, total_iter, config):
 # }
 
 # Base Adam
+# base_adam_config = {
+#     'optim': 'Adam',
+#     'lr': 1e-5,
+#     'agg_batch': 32,
+#     'epoch': 40,
+# }
 base_adam_config = {
     'optim': 'Adam',
-    'lr': 1e-4,
+    'lr': 1e-5,
     'agg_batch': 32,
-    'epoch': 40,
+    'epoch': 8,
 }
+
+
+# base_adam_config = {
+#     'optim': 'Adam',
+#     'lr': 1e-4,
+#     'agg_batch': 32,
+#     'epoch': 40,
+# }
 
 def base_adam(optimizer, current_iter, total_iter, config):
     if (current_iter / total_iter) < 0.5:
