@@ -18,9 +18,10 @@ def build_network(net_name, config):
 def load_framework(net_name):
     # Load Configure
     config = importlib.import_module('base.config').base_config(net_name)
-    #print(config)
     os.environ["CUDA_VISIBLE_DEVICES"] = config['gpus']
-    
+
+
+
     # Constructing network
     model = build_network(net_name, config) #importlib.import_module('base.model').Network(net_name, config)
     
@@ -48,5 +49,4 @@ def load_framework(net_name):
     
     # Set optimizer and schedule
     optimizer, schedule = importlib.import_module('base.strategy').Strategy(model, config)
-    
     return config, model, optimizer, schedule, loss, saver

@@ -6,14 +6,14 @@ from segment_anything.modeling import Sam
 from safetensors import safe_open
 from methods.segment_anything import sam_model_registry
 
-custom_config = {'base'      : {'strategy': 'base_adam',
-                                'batch': 2,
-                               },
+custom_config = {'base': {'strategy': 'base_adam',
+                          'batch': 2,
+                          },
                  'customized': {'--ckpt_path': {'type': str, 'default': './ckpts/sam_vit_b_01ec64.pth'},
                                 '--model_type': {'type': str, 'default': 'vit_b'},
                                 '--rank': {'type': int, 'default': 4},
-                               },
-                }
+                                },
+                 }
 
 
 class _LoRA_qkv(nn.Module):
@@ -63,7 +63,8 @@ class Network(nn.Module):
         assert r > 0
         # base_vit_dim = sam_model.image_encoder.patch_embed.proj.out_channels
         # dim = base_vit_dim
-        self.lora_layer = list(range(len(sam_model.image_encoder.blocks)))  # Only apply lora to the image encoder by default
+        self.lora_layer = list(
+            range(len(sam_model.image_encoder.blocks)))  # Only apply lora to the image encoder by default
         # create for storage, then we can init them or load weights
         self.w_As = []  # These are linear layers
         self.w_Bs = []
