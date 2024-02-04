@@ -95,6 +95,12 @@ def main():
                 gts = F.upsample(gts, size=(input_size, input_size), mode='nearest')
 
             Y = model(images, 'train')
+
+            for name, param in model.named_parameters():
+                print(f"{name}: {param.requires_grad}")
+            # 检查模型输出的 requires_grad
+            print(f"Model output Y requires grad: {Y.requires_grad}")
+            exit()
             loss = model_loss(Y, gts, config) / ave_batch
             loss_count += loss.data
             loss.backward()

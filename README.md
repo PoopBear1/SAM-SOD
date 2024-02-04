@@ -4,5 +4,6 @@
 Thanks:
 
 + https://github.com/hitachinsk/SAMed
-+ https://github.com/moothes/SALOD
-+ https://drive.google.com/file/d/17X4SiSVuBmqkvQJe_ScVARKPM_vgvCOi/view
++ [run files]https://github.com/moothes/SALOD
++ [data]https://drive.google.com/file/d/17X4SiSVuBmqkvQJe_ScVARKPM_vgvCOi/view
++ [loralib]https://github.com/QingruZhang/AdaLoRA

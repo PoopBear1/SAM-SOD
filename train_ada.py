@@ -62,6 +62,7 @@ def main():
     init_warmup = int(num_iter / ave_batch)
     final_warmup = int((3 * num_iter) / ave_batch)
     total_step = int((num_epoch * num_iter) / ave_batch)
+
     rankallocator = RankAllocator(
         model, lora_r=config['rank'], target_rank=config['target_rank'],
         init_warmup=init_warmup, final_warmup=final_warmup, mask_interval=10,
