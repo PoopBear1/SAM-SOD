@@ -31,14 +31,16 @@ def main():
     ave_batch = config['agg_batch'] // config['batch']
     # agg_batch: batch size for backwarding.
     # batch: batch size when loading to gpus. Decided by the GPU memory.
-    print(sorted(config.items()))
+    # print(sorted(config.items()))
 
-    print(f"Training {config['model_name']} with {config['backbone']} backbone using {config['strategy']} strategy on GPU: {config['gpus']}.")
+    # print(f"Training {config['model_name']} with {config['backbone']} backbone using {config['strategy']} strategy on GPU: {config['gpus']}.")
 
     # Loading datasets
     train_loader = get_loader(config)
     test_sets = OrderedDict()
+
     for set_name in config['vals']:
+        print(set_name)
         test_sets[set_name] = Test_Dataset(name=set_name, config=config)
 
     start_epoch = 1
@@ -54,8 +56,6 @@ def main():
     debug = config['debug']
     num_epoch = config['epoch']
     num_iter = len(train_loader)
-    #ave_batch = config['ave_batch']
-    trset = config['trset']
 
     # Initialize the RankAllocator
     print(num_epoch, num_iter)
@@ -90,8 +90,6 @@ def main():
         for i, pack in enumerate(train_loader, start=1):
             current_iter = (epoch - 1) * num_iter + i
             total_iter = num_epoch * num_iter
-            #print('iter: ', total_iter, current_iter)
-
             sche(optim, current_iter, total_iter, config)
 
             images, gts = pack
@@ -116,11 +114,9 @@ def main():
                     images = F.upsample(images, size=(input_size, input_size), mode='bilinear', align_corners=True)
                     gts = F.upsample(gts, size=(input_size, input_size), mode='nearest')
                 else:
-                    #scales = [-1, 0, 1]
                     scales = [-2, -1, 0, 1, 2]
                     input_size = config['size']
                     input_size += int(np.random.choice(scales, 1) * 64)
-                    #input_size += int(np.random.choice(scales, 1) * 32)
                     images = F.upsample(images, size=(input_size, input_size), mode='bilinear', align_corners=True)
                     gts = F.upsample(gts, size=(input_size, input_size), mode='nearest')
 
@@ -153,13 +149,6 @@ def main():
             test_model(model, test_sets, config, epoch)
 
 
-        #if trset in ('DUTS-TR', 'MSB-TR', 'COD-TR') and epoch > num_epoch - 10:
-        #if epoch > num_epoch - 5:
-        #    test_model(model, test_sets, config, epoch)
-        #test_model(model, test_sets, config, epoch)
-
-    #if trset != 'DUTS-TR':
-    #    test_model(model, test_sets, config, epoch)
 
 if __name__ == "__main__":
     main()

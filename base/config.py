@@ -59,20 +59,28 @@ def base_config(net_name):
 
     if config['trset'] == 'SALOD':
         config['vals'] = ['SALOD']
+        print("Debug: Setting config['vals'] to ['SALOD']")
     elif config['trset'] == 'simple':
         config['vals'] = ['tough', 'normal']
+        print("Debug: Setting config['vals'] to ['tough', 'normal']")
     elif config['trset'] == 'DUTS-TR':
         if config['vals'] == 'all':
             config['vals'] = ['PASCAL-S', 'ECSSD', 'HKU-IS', 'DUTS-TE', 'DUT-OMRON']
+            print("Debug: Setting config['vals'] to ['PASCAL-S', 'ECSSD', 'HKU-IS', 'DUTS-TE', 'DUT-OMRON']")
         else:
             config['vals'] = config['vals'].split(',')
+            print(f"Debug: Splitting config['vals'] into list: {config['vals']}")
     elif config['trset'] == 'COD-TR':
         if config['vals'] == 'all':
             config['vals'] = ['COD-TE', 'NC4K', 'CAMO-TE']
+            print("Debug: Setting config['vals'] to ['COD-TE', 'NC4K', 'CAMO-TE']")
         else:
             config['vals'] = config['vals'].split(',')
+            print(f"Debug: Splitting config['vals'] into list: {config['vals']}")
     else:
+        print('Unknown trset')
         config['vals'] = config['vals'].split(',')
+
 
     save_path = os.path.join(config['save_path'], config['model_name'], config['backbone'], config['sub'])
     check_path(save_path)

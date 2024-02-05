@@ -13,6 +13,7 @@ def get_image_list(name, config, phase):
     images = []
     gts = []
     if name in ('simple', 'tough', 'normal'):
+        # print("case1")
         train_split = 10000
 
         print('Objectness shifting experiment.')
@@ -34,20 +35,32 @@ def get_image_list(name, config, phase):
 
     # Benchmark
     elif name == 'SALOD':
+        # print("case2")
         f = open(os.path.join(config['data_path'], 'SALOD/{}.txt'.format(phase)), 'r')
         img_list = f.readlines()
 
         images = [os.path.join(config['data_path'], name, 'images', line.strip() + '.jpg') for line in img_list]
         gts = [os.path.join(config['data_path'], name, 'mask', line.strip() + '.png') for line in img_list]
+
+    # Scan-Net datasets
+    # elif name == 'SCAN':
+    #     image_root = os.path.join(config['data_path'], name, 'images')
+    #     gt_root = os.path.join(config['data_path'], name, 'segmentations')
+    #     images = sorted(
+    #         [os.path.join(image_root, f) for f in os.listdir(image_root) if f.endswith('.jpg') or f.endswith('.png')])
+    #     gts = sorted([os.path.join(gt_root, f) for f in os.listdir(gt_root) if f.endswith('.png')])
     # Original SOD datasets
+
     else:
+        # print("case3")
         image_root = os.path.join(config['data_path'], name, 'images')
         gt_root = os.path.join(config['data_path'], name, 'segmentations')
+        print(os.path.join(config['data_path'], name, 'images'), len(images), len(gts))
 
         images = sorted([os.path.join(image_root, f) for f in os.listdir(image_root) if f.endswith('.jpg') or f.endswith('.png')])
         gts = sorted([os.path.join(gt_root, f) for f in os.listdir(gt_root) if f.endswith('.png')])
-        #print(os.path.join(config['data_path'], name, 'images'), len(images), len(gts))
 
+        # exit()
     return images, gts
 
 def get_loader(config):
@@ -86,6 +99,7 @@ def RandomCrop(image, mask):
 
 class Train_Dataset(data.Dataset):
     def __init__(self, name, config):
+        print(name)
         self.config = config
         self.images, self.gts = get_image_list(name, config, 'train')
         self.size = len(self.images)
