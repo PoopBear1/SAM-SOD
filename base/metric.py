@@ -3,7 +3,30 @@ from scipy.ndimage import center_of_mass, convolve, distance_transform_edt as bw
 
 #import matplotlib.pyplot as plt
 
+class CLS_MetricRecorder:
+    def __init__(self, n_classes=40):
+        # 初始化准确率和mIoU计算类
+        self.accuracy = cal_accuracy()
+        self.mIoU = cal_mIoU(n_classes)
+        self.n_classes = n_classes
 
+    def update(self, pred, gt):
+        # 更新准确率和mIoU指标
+        self.accuracy.update(pred, gt)
+        self.mIoU.update(pred, gt)
+
+    def show(self, bit_num: int):
+        # 显示准确率和mIoU指标，并四舍五入到指定的小数位数
+        acc = self.accuracy.show()
+        miou = self.mIoU.show()
+        acc, miou = self.round_bit_num(data=[acc, miou], bit_num=bit_num)
+        print(f'Accuracy: {acc:.{bit_num}f}, mIoU: {miou:.{bit_num}f}')
+        return acc, miou
+
+    def round_bit_num(self, data: list, bit_num: int):
+        # 将数据列表中的每个元素四舍五入到指定的小数位数
+        results = [round(d, bit_num) for d in data]
+        return results
 
 class MetricRecorder:
     def __init__(self, eval_length_for_fm, beta_for_wfm=1):
@@ -126,6 +149,43 @@ def normalize_pil(pre, gt):
     else:
         pre = (pre - min_pre) / (max_pre - min_pre)
     return pre, gt
+
+class cal_accuracy(object):
+    def __init__(self):
+        self.correct_pixels = 0
+        self.total_pixels = 0
+
+    def update(self, pred, gt):
+        self.correct_pixels += (pred == gt).sum()
+        self.total_pixels += gt.size
+
+    def cal(self):
+        return self.correct_pixels / self.total_pixels if self.total_pixels > 0 else 0
+
+    def show(self):
+        return self.cal()
+
+
+class cal_mIoU(object):
+    def __init__(self, n_classes):
+        self.n_classes = n_classes
+        self.intersection = np.zeros(n_classes)
+        self.union = np.zeros(n_classes)
+
+    def update(self, pred, gt):
+        for cls in range(self.n_classes):
+            pred_inds = (pred == cls)
+            gt_inds = (gt == cls)
+            self.intersection[cls] += (pred_inds & gt_inds).sum()
+            self.union[cls] += pred_inds.sum() + gt_inds.sum() - (pred_inds & gt_inds).sum()
+
+    def cal(self):
+        iou = self.intersection / self.union
+        return np.nanmean(iou)  # Avoid division by zero
+
+    def show(self):
+        return self.cal()
+
 
 class cal_fm(object):
     # Fmeasure(maxFm, meanFm)---Frequency-tuned salient region detection(CVPR 2009)

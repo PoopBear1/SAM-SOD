@@ -33,7 +33,6 @@ def load_framework(net_name):
         print('MACs: {:.2f} G, Params: {:.2f} M.'.format(macs / 1e9, params / 1e6))
         
     loss = importlib.import_module('base.loss').Loss_factory(config)
-    
     # Loading Saver if it exists
     if config['save'] and os.path.exists('methods/{}/saver.py'.format(net_name)):
         saver = importlib.import_module('methods.{}.saver'.format(net_name)).Saver

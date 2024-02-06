@@ -52,6 +52,59 @@ def BCE(preds, target, config):
     loss = bce(preds, target)
     return loss
 
+def IOU(preds, target, config):
+    pred = torch.sigmoid(preds)
+
+    inter = torch.sum(target * pred, dim=(1, 2, 3))
+    union = torch.sum(target, dim=(1, 2, 3)) + torch.sum(pred, dim=(1, 2, 3)) - inter
+    iou_loss = 1 - (inter / union).mean()
+    return iou_loss
+
+def MCE(preds, target, config):
+    # 注意: CrossEntropyLoss的输入不需要softmax或sigmoid激活，因为它内部处理了这些操作
+    mce = nn.CrossEntropyLoss()
+    target = torch.squeeze(target, 1).long()
+    # 无需扩展target，CrossEntropyLoss期望的target是类别索引
+    loss = mce(preds, target)
+    return loss
+
+
+import torch
+import torch.nn.functional as F
+
+def mIoU(preds, target, config, n_classes=40):
+    # print("Original target shape:", target.shape)
+    target = torch.squeeze(target, 1)  # 去除通道维度，如果有的话
+    # print("Target shape after squeeze:", target.shape)
+
+    pred_softmax = torch.softmax(preds, dim=1)
+    _, pred = torch.max(pred_softmax, dim=1)  # 获取最大概率的类别索引
+    # print("Pred shape after softmax and argmax:", pred.shape)
+
+    # 为pred生成独热编码
+    one_hot_pred = F.one_hot(pred, num_classes=n_classes).permute(0, 3, 1, 2).float()
+    # print("One-hot pred shape after permute:", one_hot_pred.shape)
+
+    # 确保target是长整型并有正确的形状
+    target_one_hot = F.one_hot(target.long(), num_classes=n_classes).permute(0, 3, 1, 2).float()
+    # print("One-hot target shape after permute:", target_one_hot.shape)
+
+    iou_list = []
+    for cls in range(n_classes):
+        pred_inds = one_hot_pred[:, cls, :, :]
+        target_inds = target_one_hot[:, cls, :, :]
+        inter = (pred_inds * target_inds).sum(dim=(1, 2))  # 直接在两个维度上求和
+        union = pred_inds.sum(dim=(1, 2)) + target_inds.sum(dim=(1, 2)) - inter
+        iou = inter / union.clamp(min=1e-6)
+        iou_list.append(iou)
+
+    mIoU_loss = 1 - torch.stack(iou_list, dim=1).mean(dim=1).mean()
+
+    return mIoU_loss
+
+
+
+
 def CTLoss(preds, target, config):
     bce = nn.BCEWithLogitsLoss(reduction='none')
 
@@ -63,13 +116,6 @@ def CTLoss(preds, target, config):
     loss = (bce(preds, target) * wm).mean()
     return loss
 
-def IOU(preds, target, config):
-    pred = torch.sigmoid(preds)
-
-    inter = torch.sum(target * pred, dim=(1, 2, 3))
-    union = torch.sum(target, dim=(1, 2, 3)) + torch.sum(pred, dim=(1, 2, 3)) - inter
-    iou_loss = 1 - (inter / union).mean()
-    return iou_loss
 
 def DICE(preds, target, config):
     target = target.expand_as(preds)
@@ -156,9 +202,8 @@ def mse(preds, target, config):
     return loss
 
 
-
 loss_dict = {'b': BCE, 's': SSIM, 'i': IOU, 'd': DICE, 'e': Edge, 'a': boundary_dice_loss,\
-             'c': CTLoss, 'f': Fscore, 'w': wFs, 'o': Focal, 'm': mse}
+             'c': CTLoss, 'f': Fscore, 'w': wFs, 'o': Focal, 'm': mse, 'M': MCE, 'I': mIoU}
 
 class loss_worker(nn.Module):
     def __init__(self, losses, lws):
@@ -208,4 +253,9 @@ class Loss_factory(nn.Module):
                     tar = target
                 loss += worker(preds[out_tag], tar, config)
 
+
         return loss
+
+    def print_loss_info(self):
+        for out_name, worker in self.loss_cluster.items():
+            print('{} loss for output "{}".'.format(worker.loss_print, out_name))
