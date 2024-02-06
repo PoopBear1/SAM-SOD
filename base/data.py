@@ -1,10 +1,10 @@
 import os
-import torch
 import random
+
 import numpy as np
-from PIL import Image
+import torch
 import torch.utils.data as data
-import torchvision.transforms as transforms
+from PIL import Image
 
 mean = np.array([0.485, 0.456, 0.406]).reshape([1, 1, 3])
 std = np.array([0.229, 0.224, 0.225]).reshape([1, 1, 3])

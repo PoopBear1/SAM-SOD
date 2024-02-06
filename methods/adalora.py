@@ -1,11 +1,8 @@
-import math
+import loralib
 import torch
 import torch.nn as nn
-from torch.nn.parameter import Parameter
-from segment_anything.modeling import Sam
-from safetensors import safe_open
+
 from methods.segment_anything import sam_model_registry
-import loralib
 
 custom_config = {'base'      : {'strategy': 'base_adam',
                                 'batch': 2,

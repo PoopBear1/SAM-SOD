@@ -1,11 +1,6 @@
-import importlib
-from torch import nn
 import math
 
-from torch.nn import functional as F
 from torch.optim import *
-import torch.optim.lr_scheduler as sche
-
 
 # Base SGD
 base_sgd_config = {

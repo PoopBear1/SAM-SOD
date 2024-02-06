@@ -1,21 +1,17 @@
 import sys
-import os
 import time
-import random
-
-#from thop import profile
-import torch
-from torch.nn import utils
 # from progress.bar import Bar
 from collections import OrderedDict
-from PIL import Image
 
-from base.framework_factory import load_framework
-from base.util import *
-from base.data import get_loader, Test_Dataset
-from test import test_model
 from loralib import RankAllocator
 from loralib import compute_orth_regu
+# from thop import profile
+from torch.nn import utils
+
+from base.data import get_loader, Test_Dataset
+from base.framework_factory import load_framework
+from base.util import *
+from test import test_model
 
 torch.set_printoptions(precision=5)
 

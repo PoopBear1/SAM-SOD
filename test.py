@@ -1,20 +1,18 @@
-import numpy as np
 import sys
-import importlib
 #from data_esod import ESOD_Test
-import torch
+import sys
+# from data_esod import ESOD_Test
 import time
-from progress.bar import Bar
-import os
 from collections import OrderedDict
-import cv2
-from PIL import Image
 
-from base.framework_factory import load_framework
+from PIL import Image
+from progress.bar import Bar
+
 from base.data import Test_Dataset
+from base.framework_factory import load_framework
 from base.metric import *
 from base.util import *
-import matplotlib.pyplot as plt
+
 
 def visualize_semantic_map(semantic_map):
     np.random.seed(42)  # 确保颜色映射的一致性
