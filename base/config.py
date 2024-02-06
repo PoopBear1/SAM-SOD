@@ -80,7 +80,8 @@ def base_config(net_name):
     else:
         print('Unknown trset')
         config['vals'] = config['vals'].split(',')
-
+    # print(config['vals'])
+    # exit()
 
     save_path = os.path.join(config['save_path'], config['model_name'], config['backbone'], config['sub'])
     check_path(save_path)
