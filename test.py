@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 def visualize_semantic_map(semantic_map):
     np.random.seed(42)  # 确保颜色映射的一致性
     # 为40个类别生成随机颜色映射
-    colors = np.random.randint(0, 255, (40, 3), dtype=np.uint8)
+    colors = np.random.randint(0, 255, (41, 3), dtype=np.uint8)
 
     # 直接使用颜色映射数组，避免循环
     # 创建一个与semantic_map_np形状相匹配、但是每个像素是RGB颜色的新数组
