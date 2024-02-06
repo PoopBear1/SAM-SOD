@@ -63,6 +63,8 @@ def IOU(preds, target, config):
 def MCE(preds, target, config):
     # 注意: CrossEntropyLoss的输入不需要softmax或sigmoid激活，因为它内部处理了这些操作
     mce = nn.CrossEntropyLoss()
+    print("in MCE: ",preds.shape, target.shape)
+    exit()
     target = torch.squeeze(target, 1).long()
     # 无需扩展target，CrossEntropyLoss期望的target是类别索引
     loss = mce(preds, target)

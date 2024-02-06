@@ -78,7 +78,7 @@ def base_config(net_name):
             config['vals'] = config['vals'].split(',')
             print(f"Debug: Splitting config['vals'] into list: {config['vals']}")
     else:
-        print('Unknown trset')
+        print('Debug: Unknown trset')
         config['vals'] = config['vals'].split(',')
     # print(config['vals'])
     # exit()

@@ -20,7 +20,6 @@ class CLS_MetricRecorder:
         acc = self.accuracy.show()
         miou = self.mIoU.show()
         acc, miou = self.round_bit_num(data=[acc, miou], bit_num=bit_num)
-        print(f'Accuracy: {acc:.{bit_num}f}, mIoU: {miou:.{bit_num}f}')
         return acc, miou
 
     def round_bit_num(self, data: list, bit_num: int):

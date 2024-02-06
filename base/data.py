@@ -117,20 +117,18 @@ class Train_Dataset(data.Dataset):
 
         img_size = self.config['size']
         image = image.resize((img_size, img_size))
-        gt = gt.resize((img_size, img_size))
+        gt = gt.resize((img_size, img_size), Image.NEAREST)
 
         image = np.array(image).astype(np.float32)
         gt = np.array(gt)
 
         #print(image.shape, gt.shape)
         if random.random() > 0.5:
-            image = image[:, ::-1]
-            gt = gt[:, ::-1]
+            image = image[:, ::-1].copy()
+            gt = gt[:, ::-1].copy()
 
         image = ((image / 255.) - mean) / std
-        # image = image / 255.
         image = image.transpose((2, 0, 1))
-        gt = np.expand_dims((gt > 128).astype(np.float32), axis=0)
         return image, gt
 
     def __len__(self):
@@ -144,22 +142,18 @@ class Test_Dataset:
 
     def load_data(self, index):
         image = Image.open(self.images[index]).convert('RGB')
-        #if not self.config['orig_size']:
         image = image.resize((self.config['size'], self.config['size']))
         image = np.array(image).astype(np.float32)
-        gt = np.array(Image.open(self.gts[index]).convert('L'))
-        #gt = Image.open(self.gts[index]).convert('L')
-        #gt = gt.resize((self.config['size'], self.config['size']))
-        #gt = np.array(gt).astype(np.float32)
+        gt = Image.open(self.gts[index]).convert('L')
+        gt = gt.resize((self.config['size'], self.config['size']),Image.NEAREST)
+        gt = np.array(gt)
+
         name = self.images[index].split('/')[-1].split('.')[0]
 
-
         image = ((image / 255.) - mean) / std
-        # image = image / 255.
-
         image = image.transpose((2, 0, 1))
         image = torch.tensor(np.expand_dims(image, 0)).float()
-        gt = (gt > 128).astype(np.float32)
+
         return image, gt, name
 
 def test_data():

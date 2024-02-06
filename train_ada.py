@@ -95,32 +95,22 @@ def main():
             images, gts = pack
             images, gts= images.float().cuda(), gts.float().cuda()
 
+
+
             if config['multi']:
-                if net_name == 'picanet':
-                    # picanet only support 320*320 input now!
-                    # picanet doesn't support multi-scale training, so we crop images to same sizes to simulate it.
-                    input_size = config['size']
-                    images = F.upsample(images, size=(input_size, input_size), mode='bilinear', align_corners=True)
-                    gts = F.upsample(gts, size=(input_size, input_size), mode='nearest')
+                scales = [-2, -1, 0, 1, 2]
+                input_size = config['size']
+                input_size += int(np.random.choice(scales, 1) * 64)
+                # images = F.upsample(images, size=(input_size, input_size), mode='bilinear', align_corners=True)
+                # gts = F.upsample(gts, size=(input_size, input_size), mode='nearest')
+                images = F.interpolate(images, size=(input_size, input_size), mode='bilinear', align_corners=True)
+                gts = gts.unsqueeze(1)  # 在第1维（C维）处添加一个大小为1的新维度
+                gts = F.interpolate(gts, size=(input_size, input_size), mode='nearest')
 
-                    scales = [16, 8, 0]
-                    scale = np.random.choice(scales, 1)
-                    w_start = int(random.random() * scale)
-                    h_start = int(random.random() * scale)
-                    new_size = int(input_size - scale)
-                    images = images[:, :, h_start:h_start+new_size, w_start:w_start+new_size]
-                    gts = gts[:, :, h_start:h_start+new_size, w_start:w_start+new_size]
-
-                    images = F.upsample(images, size=(input_size, input_size), mode='bilinear', align_corners=True)
-                    gts = F.upsample(gts, size=(input_size, input_size), mode='nearest')
-                else:
-                    scales = [-2, -1, 0, 1, 2]
-                    input_size = config['size']
-                    input_size += int(np.random.choice(scales, 1) * 64)
-                    images = F.upsample(images, size=(input_size, input_size), mode='bilinear', align_corners=True)
-                    gts = F.upsample(gts, size=(input_size, input_size), mode='nearest')
-
+            print(images.shape, gts.shape)
             Y = model(images, 'train')
+            print("rst shape",Y['sal'].shape, Y['final'].shape)
+            exit()
             # print(Y['sal'].shape, Y['final'].shape, gts.shape)
             loss = model_loss(Y, gts, config) / ave_batch
             loss_count += loss.data

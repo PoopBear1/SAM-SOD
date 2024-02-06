@@ -1,3 +1,4 @@
+import numpy as np
 import sys
 import importlib
 #from data_esod import ESOD_Test
@@ -8,16 +9,27 @@ import os
 from collections import OrderedDict
 import cv2
 from PIL import Image
-import numpy as np
 
 from base.framework_factory import load_framework
 from base.data import Test_Dataset
 from base.metric import *
 from base.util import *
+import matplotlib.pyplot as plt
 
+def visualize_semantic_map(semantic_map):
+    np.random.seed(42)  # 确保颜色映射的一致性
+    # 为40个类别生成随机颜色映射
+    colors = np.random.randint(0, 255, (40, 3), dtype=np.uint8)
+
+    # 直接使用颜色映射数组，避免循环
+    # 创建一个与semantic_map_np形状相匹配、但是每个像素是RGB颜色的新数组
+    visualized_map_np = colors[semantic_map]
+    return visualized_map_np
 def test_model(model, test_sets, config, saver=None):
     model.eval()
     st = time.time()
+    torch.manual_seed(42)
+
     for set_name, test_set in test_sets.items():
         save_folder = os.path.join(config['save_path'], set_name)
         check_path(save_folder)
@@ -29,28 +41,27 @@ def test_model(model, test_sets, config, saver=None):
         for j in range(titer):
             image, gt, name = test_set.load_data(j)
             Y = model(image.cuda())
-            preds = torch.argmax(Y['final'], dim=1).cpu().numpy()
-            gt = gt.numpy()
+            preds = torch.argmax(Y['final'], dim=1).squeeze().cpu().numpy()
+
             MR.update(pred=preds, gt=gt)
 
-            #scores.append(get_scores(pred, gt))
-            #print(get_scores(pred, gt))
-
+            config['save'] = torch.rand(1) < 1
             # save predictions
             if config['save']:
-                pass
-                # fnl_folder = os.path.join(save_folder, 'final')
-                # check_path(fnl_folder)
-                # im_path = os.path.join(fnl_folder, name + '.png')
+                print("saving output")
+                fnl_folder = os.path.join(save_folder, 'final')
+                check_path(fnl_folder)
+                im_path = os.path.join(fnl_folder, name + '.png')
                 # 保存预测类别图像，可能需要将类别标签映射到颜色
-                # pred_img = ...  # 将preds转换为可视化图像的代码
-                # Image.fromarray(pred_img).save(im_path)
-
+                pred_img = visualize_semantic_map(preds)
+                Image.fromarray(pred_img).save(im_path)
+                print(fnl_folder)
+                exit()
                 if saver is not None:
                     saver(Y, gt, name, save_folder, config)
                     pass
             test_bar.next()
-
+        exit(-1)
         acc, miou = MR.show(bit_num=3)
         print('  acc: {:.3f}, miou: {:.3f}'.format(acc, miou))
 
