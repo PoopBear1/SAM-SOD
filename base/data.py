@@ -145,7 +145,7 @@ class Test_Dataset:
         image = image.resize((self.config['size'], self.config['size']))
         image = np.array(image).astype(np.float32)
         gt = Image.open(self.gts[index]).convert('L')
-        gt = gt.resize((self.config['size'], self.config['size']),Image.NEAREST)
+        gt = gt.resize((self.config['size'], self.config['size']), Image.NEAREST)
         gt = np.array(gt)
 
         name = self.images[index].split('/')[-1].split('.')[0]

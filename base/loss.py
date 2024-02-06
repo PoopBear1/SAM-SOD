@@ -61,50 +61,48 @@ def IOU(preds, target, config):
     return iou_loss
 
 def MCE(preds, target, config):
-    # 注意: CrossEntropyLoss的输入不需要softmax或sigmoid激活，因为它内部处理了这些操作
-    mce = nn.CrossEntropyLoss()
-    print("in MCE: ",preds.shape, target.shape)
-    exit()
+    if not torch.all((target >= 0) & (target < 41)):
+        print("Invalid target detected")
+        print("Min label:", target.min().item(), "Max label:", target.max().item())
+        exit(1)
+
+    mce = nn.CrossEntropyLoss(ignore_index=0)
+    # print("in MCE: ", preds.shape, target.shape)
+    # exit()
     target = torch.squeeze(target, 1).long()
-    # 无需扩展target，CrossEntropyLoss期望的target是类别索引
     loss = mce(preds, target)
     return loss
 
+def mIoU(preds, target, config, n_classes=41):
+    if not torch.all((target >= 0) & (target < n_classes)):
+        print("Invalid target detected")
+        print("Min label:", target.min().item(), "Max label:", target.max().item())
+        exit(1)
 
-import torch
-import torch.nn.functional as F
-
-def mIoU(preds, target, config, n_classes=40):
-    # print("Original target shape:", target.shape)
+    mask = (target == 0)
     target = torch.squeeze(target, 1)  # 去除通道维度，如果有的话
-    # print("Target shape after squeeze:", target.shape)
 
     pred_softmax = torch.softmax(preds, dim=1)
     _, pred = torch.max(pred_softmax, dim=1)  # 获取最大概率的类别索引
-    # print("Pred shape after softmax and argmax:", pred.shape)
 
-    # 为pred生成独热编码
     one_hot_pred = F.one_hot(pred, num_classes=n_classes).permute(0, 3, 1, 2).float()
-    # print("One-hot pred shape after permute:", one_hot_pred.shape)
-
-    # 确保target是长整型并有正确的形状
     target_one_hot = F.one_hot(target.long(), num_classes=n_classes).permute(0, 3, 1, 2).float()
-    # print("One-hot target shape after permute:", target_one_hot.shape)
 
-    iou_list = []
-    for cls in range(n_classes):
-        pred_inds = one_hot_pred[:, cls, :, :]
-        target_inds = target_one_hot[:, cls, :, :]
-        inter = (pred_inds * target_inds).sum(dim=(1, 2))  # 直接在两个维度上求和
-        union = pred_inds.sum(dim=(1, 2)) + target_inds.sum(dim=(1, 2)) - inter
-        iou = inter / union.clamp(min=1e-6)
-        iou_list.append(iou)
 
-    mIoU_loss = 1 - torch.stack(iou_list, dim=1).mean(dim=1).mean()
+    one_hot_pred.masked_fill_(mask, 0)
+    target_one_hot.masked_fill_(mask, 0)
+
+    # 计算交集和并集
+    inter = (one_hot_pred * target_one_hot).sum(dim=(0, 2, 3))
+    union = one_hot_pred.sum(dim=(0, 2, 3)) + target_one_hot.sum(dim=(0, 2, 3)) - inter
+
+    # 计算IoU并处理除以零的情况
+    iou = inter / union.clamp(min=1e-6)
+
+    # 计算mIoU并转换为损失
+    mIoU_loss = 1 - iou.mean()
 
     return mIoU_loss
-
-
 
 
 def CTLoss(preds, target, config):

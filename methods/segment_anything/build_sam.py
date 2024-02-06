@@ -17,6 +17,7 @@ def build_sam_vit_h(checkpoint=None):
         encoder_depth=32,
         encoder_num_heads=16,
         encoder_global_attn_indexes=[7, 15, 23, 31],
+        n_class=40,
         checkpoint=checkpoint,
     )
 
@@ -30,9 +31,9 @@ def build_sam_vit_l(checkpoint=None):
         encoder_depth=24,
         encoder_num_heads=16,
         encoder_global_attn_indexes=[5, 11, 17, 23],
+        n_class=40,
         checkpoint=checkpoint,
     )
-
 
 def build_sam_vit_b(checkpoint=None):
     return _build_sam(
@@ -40,6 +41,7 @@ def build_sam_vit_b(checkpoint=None):
         encoder_depth=12,
         encoder_num_heads=12,
         encoder_global_attn_indexes=[2, 5, 8, 11],
+        n_class=40,
         checkpoint=checkpoint,
     )
 
@@ -54,6 +56,7 @@ def _build_sam(
     encoder_depth,
     encoder_num_heads,
     encoder_global_attn_indexes,
+    n_class=40,
     checkpoint=None,
 ):
     prompt_embed_dim = 256
@@ -82,7 +85,8 @@ def _build_sam(
             mask_in_chans=16,
         ),
         mask_decoder=MaskDecoder(
-            num_multimask_outputs=3,
+            # num_multimask_outputs=3,
+            num_multimask_outputs=n_class,
             transformer=TwoWayTransformer(
                 depth=2,
                 embedding_dim=prompt_embed_dim,

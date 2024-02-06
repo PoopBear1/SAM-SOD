@@ -58,7 +58,7 @@ def main():
     num_iter = len(train_loader)
 
     # Initialize the RankAllocator
-    print(num_epoch, num_iter)
+    print("num_epoch: {}, num_iter:{}".format(num_epoch, num_iter))
     init_warmup = int(num_iter / ave_batch)
     final_warmup = int((3 * num_iter) / ave_batch)
     total_step = int((num_epoch * num_iter) / ave_batch)
@@ -107,11 +107,9 @@ def main():
                 gts = gts.unsqueeze(1)  # 在第1维（C维）处添加一个大小为1的新维度
                 gts = F.interpolate(gts, size=(input_size, input_size), mode='nearest')
 
-            print(images.shape, gts.shape)
+            # print(images.shape, gts.shape)
             Y = model(images, 'train')
-            print("rst shape",Y['sal'].shape, Y['final'].shape)
-            exit()
-            # print(Y['sal'].shape, Y['final'].shape, gts.shape)
+            # print("in training rst shape: ", Y['sal'].shape, Y['final'].shape, gts.shape)
             loss = model_loss(Y, gts, config) / ave_batch
             loss_count += loss.data
             (loss + (compute_orth_regu(model, regu_weight=0.1) / ave_batch)).backward()

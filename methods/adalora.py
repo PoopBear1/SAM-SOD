@@ -17,7 +17,6 @@ custom_config = {'base'      : {'strategy': 'base_adam',
                                },
                 }
 
-
 class _AdaLoRA_qkv(nn.Module):
     def __init__(self, qkv, linear_q, linear_v):
         super().__init__()
@@ -41,9 +40,19 @@ class Network(nn.Module):
 
         sam_checkpoint = config['ckpt_path']
         model_type = config['model_type']
-        sam_model = sam_model_registry[model_type](checkpoint=sam_checkpoint)
-
         r = config['rank']
+
+        ckp = torch.load(sam_checkpoint)
+
+        sam_model = sam_model_registry[model_type]()
+        sam_model_state_dict = sam_model.state_dict()
+
+        #load pretrained weights other than the last layer
+        for name, param in ckp.items():
+            if name in sam_model_state_dict and sam_model_state_dict[name].shape == param.shape:
+                sam_model_state_dict[name] = param
+
+        sam_model.load_state_dict(sam_model_state_dict,strict=False)
 
         assert r > 0
         # base_vit_dim = sam_model.image_encoder.patch_embed.proj.out_channels
