@@ -36,7 +36,7 @@ def main():
     test_sets = OrderedDict()
 
     for set_name in config['vals']:
-        print(set_name)
+        print("val set_name: ", set_name)
         test_sets[set_name] = Test_Dataset(name=set_name, config=config)
 
     start_epoch = 1
@@ -87,11 +87,8 @@ def main():
             current_iter = (epoch - 1) * num_iter + i
             total_iter = num_epoch * num_iter
             sche(optim, current_iter, total_iter, config)
-
             images, gts = pack
-            images, gts= images.float().cuda(), gts.float().cuda()
-
-
+            images, gts = images.float().cuda(), gts.float().cuda()
 
             if config['multi']:
                 scales = [-2, -1, 0, 1, 2]
@@ -121,11 +118,8 @@ def main():
                 batch_idx = 0
 
             lrs = ','.join([format(param['lr'], ".1e") for param in optim.param_groups])
-            # Bar.suffix = '{:4}/{:4} | loss: {:1.6f}, LRs: [{}], time: {:1.3f}.'.format(i, num_iter, float(loss_count / i), lrs, time.time() - st)
-            # bar.next()
             print('epoch {:2} | {:4}/{:4} | loss: {:1.6f}, LRs: [{}], time: {:1.3f}.'.format(epoch, i, num_iter, float(loss_count / i), lrs, time.time() - st))
 
-        # bar.finish()
 
         if epoch > num_epoch - 3:
             weight_path = os.path.join(config['weight_path'], '{}_{}_{}_{}.pth'.format(config['model_name'], config['backbone'], config['sub'], epoch))

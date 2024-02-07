@@ -67,8 +67,6 @@ def MCE(preds, target, config):
         exit(1)
 
     mce = nn.CrossEntropyLoss(ignore_index=0)
-    # print("in MCE: ", preds.shape, target.shape)
-    # exit()
     target = torch.squeeze(target, 1).long()
     loss = mce(preds, target)
     return loss

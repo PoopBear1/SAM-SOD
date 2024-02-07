@@ -35,12 +35,16 @@ model.eval()  # 设置为评估模式
 for param in model.parameters():
     param.requires_grad = False
 # 启用LoRA参数
-lora_params = [param for name, param in model.named_parameters() if 'lora' in name]
-for param in lora_params:
-    param.requires_grad = True
+for t_layer_i, blk in enumerate(model.image_encoder.blocks):
+    if t_layer_i not in model.lora_layer:
+        continue
+    # 解冻LoRA相关的参数
+    for param in [blk.attn.qkv.linear_q.parameters(), blk.attn.qkv.linear_v.parameters()]:
+        for p in param:
+            p.requires_grad = True
 
 # 实例化Policy Gradient
-pg_agent = SimplePolicyGradient(lora_params, lr=0.01)
+pg_agent = SimplePolicyGradient([p for p in model.parameters() if p.requires_grad], lr=0.01)
 
 # 数据加载器
 dataloader = DataLoader(...)  # 假设你已经有了数据加载器

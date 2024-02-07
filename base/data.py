@@ -55,12 +55,11 @@ def get_image_list(name, config, phase):
         # print("case3")
         image_root = os.path.join(config['data_path'], name, 'images')
         gt_root = os.path.join(config['data_path'], name, 'segmentations')
-        print(os.path.join(config['data_path'], name, 'images'), len(images), len(gts))
+        # print(os.path.join(config['data_path'], name, 'images'), len(images), len(gts))
 
         images = sorted([os.path.join(image_root, f) for f in os.listdir(image_root) if f.endswith('.jpg') or f.endswith('.png')])
         gts = sorted([os.path.join(gt_root, f) for f in os.listdir(gt_root) if f.endswith('.png')])
 
-        # exit()
     return images, gts
 
 def get_loader(config):
@@ -99,7 +98,6 @@ def RandomCrop(image, mask):
 
 class Train_Dataset(data.Dataset):
     def __init__(self, name, config):
-        print(name)
         self.config = config
         self.images, self.gts = get_image_list(name, config, 'train')
         self.size = len(self.images)
@@ -138,9 +136,16 @@ class Test_Dataset:
     def __init__(self, name, config=None):
         self.config = config
         self.images, self.gts = get_image_list(name, config, 'test')
+
+        assert len(self.images) == len(self.gts), "Images and GTs lists are not the same length!"
         self.size = len(self.images)
 
     def load_data(self, index):
+        # print(f"Loading image: {self.images[index]}")
+        # print(f"Loading GT: {self.gts[index]}")
+        if index >= self.size:
+            print(f"Index {index} is out of range for images list with size {self.size}.")
+            return None
         image = Image.open(self.images[index]).convert('RGB')
         image = image.resize((self.config['size'], self.config['size']))
         image = np.array(image).astype(np.float32)
