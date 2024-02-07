@@ -4,7 +4,7 @@ from scipy.ndimage import center_of_mass, convolve, distance_transform_edt as bw
 #import matplotlib.pyplot as plt
 
 class CLS_MetricRecorder:
-    def __init__(self, n_classes=40):
+    def __init__(self, n_classes=41):
         # 初始化准确率和mIoU计算类
         self.accuracy = cal_accuracy()
         self.mIoU = cal_mIoU(n_classes)

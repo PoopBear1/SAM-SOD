@@ -4,15 +4,16 @@ import torch.nn as nn
 
 from methods.segment_anything import sam_model_registry
 
-custom_config = {'base'      : {'strategy': 'base_adam',
-                                'batch': 2,
-                               },
+custom_config = {'base': {'strategy': 'base_adam',
+                          'batch': 2,
+                          },
                  'customized': {'--ckpt_path': {'type': str, 'default': './ckpts/sam_vit_b_01ec64.pth'},
                                 '--model_type': {'type': str, 'default': 'vit_b'},
                                 '--rank': {'type': int, 'default': 12},
                                 '--target_rank': {'type': int, 'default': 8},
-                               },
-                }
+                                },
+                 }
+
 
 class _AdaLoRA_qkv(nn.Module):
     def __init__(self, qkv, linear_q, linear_v):
@@ -44,17 +45,18 @@ class Network(nn.Module):
         sam_model = sam_model_registry[model_type]()
         sam_model_state_dict = sam_model.state_dict()
 
-        #load pretrained weights other than the last layer
+        # load pretrained weights other than the last layer
         for name, param in ckp.items():
             if name in sam_model_state_dict and sam_model_state_dict[name].shape == param.shape:
                 sam_model_state_dict[name] = param
 
-        sam_model.load_state_dict(sam_model_state_dict,strict=False)
+        sam_model.load_state_dict(sam_model_state_dict, strict=False)
 
         assert r > 0
         # base_vit_dim = sam_model.image_encoder.patch_embed.proj.out_channels
         # dim = base_vit_dim
-        self.lora_layer = list(range(len(sam_model.image_encoder.blocks)))  # Only apply lora to the image encoder by default
+        self.lora_layer = list(
+            range(len(sam_model.image_encoder.blocks)))  # Only apply lora to the image encoder by default
         # create for storage, then we can init them or load weights
 
         # lets freeze first
@@ -77,7 +79,6 @@ class Network(nn.Module):
             )
         self.sam = sam_model
         # loralib.mark_only_lora_as_trainable(self.sam)
-
 
     def forward(self, x, phase='test'):
         batched_input = x
