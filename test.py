@@ -33,7 +33,7 @@ def test_model(model, test_sets, config, saver=None):
         check_path(save_folder)
 
         titer = test_set.size
-        MR = CLS_MetricRecorder(n_classes=40)
+        MR = CLS_MetricRecorder(n_classes=41)
 
         test_bar = Bar('Dataset {:10}:'.format(set_name), max=titer)
         for j in range(titer):

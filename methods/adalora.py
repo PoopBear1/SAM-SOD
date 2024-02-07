@@ -4,11 +4,16 @@ import torch.nn as nn
 
 from methods.segment_anything import sam_model_registry
 
+
 custom_config = {'base': {'strategy': 'base_adam',
                           'batch': 2,
                           },
                  'customized': {'--ckpt_path': {'type': str, 'default': './ckpts/sam_vit_b_01ec64.pth'},
                                 '--model_type': {'type': str, 'default': 'vit_b'},
+                 # 'customized': {'--ckpt_path': {'type': str, 'default': './ckpts/sam_vit_h_4b8939.pth'},
+                 #                '--model_type': {'type': str, 'default': 'vit_h'},
+                 # 'customized': {'--ckpt_path': {'type': str, 'default': './ckpts/sam_vit_l_0b3195.pth'},
+                 #                '--model_type': {'type': str, 'default': 'vit_l'},
                                 '--rank': {'type': int, 'default': 12},
                                 '--target_rank': {'type': int, 'default': 8},
                                 },
@@ -39,7 +44,7 @@ class Network(nn.Module):
         sam_checkpoint = config['ckpt_path']
         model_type = config['model_type']
         r = config['rank']
-
+        print('Using LoRA on {}'.format(model_type))
         ckp = torch.load(sam_checkpoint)
 
         sam_model = sam_model_registry[model_type]()
