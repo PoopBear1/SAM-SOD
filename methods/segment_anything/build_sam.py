@@ -11,13 +11,13 @@ from functools import partial
 from .modeling import ImageEncoderViT, MaskDecoder, PromptEncoder, Sam, TwoWayTransformer
 
 
-def build_sam_vit_h(checkpoint=None):
+def build_sam_vit_h(n_class=40, checkpoint=None):
     return _build_sam(
         encoder_embed_dim=1280,
         encoder_depth=32,
         encoder_num_heads=16,
         encoder_global_attn_indexes=[7, 15, 23, 31],
-        n_class=40,
+        n_class=n_class,
         checkpoint=checkpoint,
     )
 
@@ -25,25 +25,27 @@ def build_sam_vit_h(checkpoint=None):
 build_sam = build_sam_vit_h
 
 
-def build_sam_vit_l(checkpoint=None):
+def build_sam_vit_l(n_class=40, checkpoint=None):
     return _build_sam(
         encoder_embed_dim=1024,
         encoder_depth=24,
         encoder_num_heads=16,
         encoder_global_attn_indexes=[5, 11, 17, 23],
-        n_class=40,
+        n_class=n_class,
         checkpoint=checkpoint,
     )
 
-def build_sam_vit_b(checkpoint=None):
+
+def build_sam_vit_b(n_class=40, checkpoint=None):
     return _build_sam(
         encoder_embed_dim=768,
         encoder_depth=12,
         encoder_num_heads=12,
         encoder_global_attn_indexes=[2, 5, 8, 11],
-        n_class=40,
+        n_class=n_class,
         checkpoint=checkpoint,
     )
+
 
 sam_model_registry = {
     "default": build_sam_vit_h,
@@ -51,13 +53,15 @@ sam_model_registry = {
     "vit_l": build_sam_vit_l,
     "vit_b": build_sam_vit_b,
 }
+
+
 def _build_sam(
-    encoder_embed_dim,
-    encoder_depth,
-    encoder_num_heads,
-    encoder_global_attn_indexes,
-    n_class=40,
-    checkpoint=None,
+        encoder_embed_dim,
+        encoder_depth,
+        encoder_num_heads,
+        encoder_global_attn_indexes,
+        n_class=40,
+        checkpoint=None,
 ):
     prompt_embed_dim = 256
     image_size = 1024

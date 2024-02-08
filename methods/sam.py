@@ -13,16 +13,6 @@ custom_config = {'base': {'strategy': 'base_adam',
                                 },
                  }
 
-# custom_config = {'base': {'strategy': 'base_adam',
-#                           'batch': 8,
-#                           },
-#                  'customized': {'--ckpt_path': {'type': str, 'default': './ckpts/sam_vit_h_4b8939.pth'},
-#                                 '--model_type': {'type': str, 'default': 'vit_h'},
-#                                 '--train_encoder': {'action': 'store_true'},
-#                                 '--train_decoder': {'action': 'store_true'},
-#                                 '--train_prompt': {'action': 'store_true'},
-#                                 },
-#                  }
 
 class Network(nn.Module):
     def __init__(self, config, encoder, feat):

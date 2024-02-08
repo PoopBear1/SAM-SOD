@@ -44,10 +44,13 @@ class Network(nn.Module):
         sam_checkpoint = config['ckpt_path']
         model_type = config['model_type']
         r = config['rank']
-        print('Using LoRA on {}'.format(model_type))
         ckp = torch.load(sam_checkpoint)
 
-        sam_model = sam_model_registry[model_type]()
+        build_function = sam_model_registry[model_type]
+        sam_model = build_function(config['n_class'])
+
+        print('Using LoRA on {}, the n_class is {}'.format(model_type, config['n_class']))
+
         sam_model_state_dict = sam_model.state_dict()
 
         # load pretrained weights other than the last layer

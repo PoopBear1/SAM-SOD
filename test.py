@@ -23,6 +23,7 @@ def visualize_semantic_map(semantic_map):
     # 创建一个与semantic_map_np形状相匹配、但是每个像素是RGB颜色的新数组
     visualized_map_np = colors[semantic_map]
     return visualized_map_np
+
 def test_model(model, test_sets, config, saver=None):
     model.eval()
     st = time.time()
@@ -54,9 +55,9 @@ def test_model(model, test_sets, config, saver=None):
                 pred_img = visualize_semantic_map(preds)
                 Image.fromarray(pred_img).save(im_path)
 
-                if saver is not None:
-                    saver(Y, gt, name, save_folder, config)
-                    pass
+                # if saver is not None:
+                    # saver(Y, gt, name, save_folder, config)
+                    # pass
             test_bar.next()
 
         acc, miou = MR.show(bit_num=3)

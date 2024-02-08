@@ -15,11 +15,12 @@ def build_network(net_name, config):
         model = importlib.import_module('methods.{}'.format(net_name)).Network(config, encoder, fl)
         return model
 
-def load_framework(net_name):
+def load_framework(net_name, change_n_class=None):
     # Load Configure
     config = importlib.import_module('base.config').base_config(net_name)
     os.environ["CUDA_VISIBLE_DEVICES"] = config['gpus']
-
+    if change_n_class is not None:
+        config['n_class'] = change_n_class
 
 
     # Constructing network

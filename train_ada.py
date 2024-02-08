@@ -40,7 +40,9 @@ def main():
         test_sets[set_name] = Test_Dataset(name=set_name, config=config)
 
     start_epoch = 1
+
     if config['resume']:
+        print("resume for training")
         saved_model = torch.load(config['weight'], map_location='cpu')
         if config['num_gpu'] > 1:
             model.module.load_state_dict(saved_model)
@@ -48,6 +50,8 @@ def main():
             model.load_state_dict(saved_model)
 
         start_epoch = int(config['weight'].split('_')[-1].split('.')[0]) + 1
+    else:
+        print("training from scratch")
 
     debug = config['debug']
     num_epoch = config['epoch']
@@ -100,9 +104,7 @@ def main():
                 gts = gts.unsqueeze(1)  # 在第1维（C维）处添加一个大小为1的新维度
                 gts = F.interpolate(gts, size=(input_size, input_size), mode='nearest')
 
-            # print(images.shape, gts.shape)
             Y = model(images, 'train')
-            # print("in training rst shape: ", Y['sal'].shape, Y['final'].shape, gts.shape)
             loss = model_loss(Y, gts, config) / ave_batch
             loss_count += loss.data
             (loss + (compute_orth_regu(model, regu_weight=0.1) / ave_batch)).backward()
